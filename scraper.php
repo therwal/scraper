@@ -4,7 +4,6 @@
  */
 
 include('simple_html_dom.php'); // for å traverse html dom
-include('Function.Array-Group-By.php'); // Hjelpe funksjon for å gruppere data
 
 ini_set('default_socket_timeout', 5);
 
@@ -129,7 +128,7 @@ $sorted = arrayMultisortByValue($data, 'dato'); // sorter først på dato
 
 $grouped = groupByAuthor($data); // så grupperer på forfatter
 
-pprint_r($grouped);
+// pprint_r($grouped);
 
 $json = json_encode($grouped, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT);
 
