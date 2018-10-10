@@ -1,6 +1,6 @@
 <?php
 /**
- * Skraper artikkler fra TU.no/artikler
+ * Skraper artikkler fra TU.no/artikler og dumper de til json
  */
 
 include('simple_html_dom.php'); // for å traverse html dom
@@ -16,7 +16,10 @@ function getDataFromLink($target) {
     if($authors != null) {
         $authors = $authors->title;
     } else {
-        $authors = $html->find('.authors li', 0)->innertext;
+        $authors = $html->find('.authors li', 0);
+        if ($authors != null) {
+            $authors = $authors->innertext;
+        }
     }
     
     if($authors == null) {
@@ -24,7 +27,12 @@ function getDataFromLink($target) {
     }
     
     // tittel
-    $headline = $html->find('.headline', 0)->plaintext;
+    $headline = $html->find('.headline', 0);
+    if($headline != null) {
+        $headline = $headline->plaintext;
+    } else {
+        $headline = "";
+    }
     
 
     // toppbilde
@@ -39,8 +47,6 @@ function getDataFromLink($target) {
     }
     if ($topImage == null) {
         $topImage = "";
-    } else {
-
     }
 
     // publiserings dato
@@ -57,6 +63,7 @@ function getDataFromLink($target) {
     
     return ["tittel"=>$headline, "toppbilde"=>$topImage, "forfatter"=>trim($authors), "url"=>$target, "dato"=>$date];
 }
+
 
 function scrape($query) {
     $next = true;
@@ -98,6 +105,13 @@ function arrayMultisortByValue($arrayToSort, $nameOfValue) {
     array_multisort($ValueContainer, $arrayToSort);
     return $arrayToSort;
 }
+
+// pretty print_r, for finere formatering i html
+function pprint_r($data) {
+    echo '<pre>';
+    print_r($data);
+    echo  '</pre>';
+}
 $startTime = microtime(true);
 
 $data = scrape('asfalt');
@@ -106,9 +120,7 @@ $sorted = arrayMultisortByValue($data, 'dato'); // sorter først på dato
 
 $grouped = array_group_by( $sorted, "forfatter"); // så grupperer på forfatter
 
-echo '<pre>';
-print_r($grouped);
-echo  '</pre>';
+pprint_r($grouped);
 
 $json = json_encode($grouped, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT);
 
