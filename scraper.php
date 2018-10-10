@@ -1,8 +1,6 @@
 <?php
 /**
- * Skrap artikkelarkivet på Tu.no. Finn alle saker som omhandler "asfalt" som ble publisert i 2012.
- * Hent ned tittel, toppbilde, forfatter, dato og url.
- * Grupper per forfatter og sorter på dato. Dump datasettet til et fornuftig format. https://www.tu.no/artikler?q=asfalt
+ * Skraper artikkler fra TU.no/artikler
  */
 
 include('simple_html_dom.php'); // for å traverse html dom
@@ -115,5 +113,5 @@ echo  '</pre>';
 $json = json_encode($grouped, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT);
 
 file_put_contents('exampleOutput/scrapeResult.json', $json);
-echo "Elapsed time is: ". (microtime(true) - $startTime) ." seconds"; 
+echo "Ferdig etter: ". (microtime(true) - $startTime) ." sekunder"; 
 ?>
