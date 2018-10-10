@@ -112,13 +112,22 @@ function pprint_r($data) {
     print_r($data);
     echo  '</pre>';
 }
+
+// returnerer array som er gruppert på forfatter
+function groupByAuthor($data) {
+    $arr = [];
+    foreach($data as $sd) {
+        $arr[$sd['forfatter']][] = ['tittel'=>$sd['tittel'], 'toppbilde'=>$sd['toppbilde'], 'forfatter'=>$sd['forfatter'], 'url'=>$sd['url'], 'dato'=>$sd['dato']];
+    }
+    return $arr;
+}
 $startTime = microtime(true);
 
 $data = scrape('asfalt');
 
 $sorted = arrayMultisortByValue($data, 'dato'); // sorter først på dato
 
-$grouped = array_group_by( $sorted, "forfatter"); // så grupperer på forfatter
+$grouped = groupByAuthor($data); // så grupperer på forfatter
 
 pprint_r($grouped);
 
