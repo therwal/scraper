@@ -2,13 +2,13 @@
 /**
  * Skraper artikkler fra TU.no/artikler og dumper de til json
  */
-
-include('simple_html_dom.php'); // for å traverse html dom
+require 'vendor/autoload.php';
+use Sunra\PhpSimple\HtmlDomParser; // for å traverse html dom
 
 ini_set('default_socket_timeout', 5);
 
 function getDataFromLink($target) {
-    $html = file_get_html($target, false, null, 0 );
+    $html = HtmlDomParser::file_get_html($target, false, null, 0 );
     
     // forfatter
     $authors = $html->find('a[rel=author]', 0);
@@ -69,10 +69,9 @@ function scrape($query) {
     $data = [];
     $url = 'https://www.tu.no/artikler';
     $link = 'https://www.tu.no/artikler?q=' . $query;
-    $html = file_get_html($link, false, null, 0 );
     
     while ($next){
-        $html = file_get_html($link, false, null, 0 );
+        $html = HtmlDomParser::file_get_html($link, false, null, 0 );
         foreach($html->find('tbody tr') as $link) {
             $time =  $link->find('time', 0);
             if ($time != null) {
@@ -126,7 +125,7 @@ $data = scrape('asfalt');
 
 $sorted = arrayMultisortByValue($data, 'dato'); // sorter først på dato
 
-$grouped = groupByAuthor($data); // så grupperer på forfatter
+$grouped = groupByAuthor($sorted); // så grupperer på forfatter
 
 // pprint_r($grouped);
 
@@ -134,4 +133,3 @@ $json = json_encode($grouped, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON
 
 file_put_contents('exampleOutput/scrapeResult.json', $json);
 echo "Ferdig etter: ". (microtime(true) - $startTime) ." sekunder"; 
-?>

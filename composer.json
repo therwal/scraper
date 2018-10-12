@@ -1,0 +1,10 @@
+{
+    "name": "walther/scraper",
+    "authors": [
+        {
+            "name": "Walther Kammen Gulbrandsen",
+            "email": "waltherkg@gmail.com"
+        }
+    ],
+    "require": {"sunra/php-simple-html-dom-parser": "1.5.2"}
+}
