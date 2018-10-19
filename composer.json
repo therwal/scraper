@@ -1,10 +1,13 @@
 {
     "name": "walther/scraper",
+    "license": "MIT",
     "authors": [
         {
             "name": "Walther Kammen Gulbrandsen",
             "email": "waltherkg@gmail.com"
         }
     ],
-    "require": {"sunra/php-simple-html-dom-parser": "1.5.2"}
+    "require": {
+        "sunra/php-simple-html-dom-parser": "1.5.2"
+    }
 }

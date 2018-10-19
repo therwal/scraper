@@ -7,12 +7,13 @@ use Sunra\PhpSimple\HtmlDomParser; // for å traverse html dom
 
 ini_set('default_socket_timeout', 5);
 
-function getDataFromLink($target) {
-    $html = HtmlDomParser::file_get_html($target, false, null, 0 );
+function getDataFromLink($target) 
+{
+    $html = HtmlDomParser::file_get_html($target, false, null, 0);
     
     // forfatter
     $authors = $html->find('a[rel=author]', 0);
-    if($authors != null) {
+    if ($authors != null) {
         $authors = $authors->title;
     } else {
         $authors = $html->find('.authors li', 0);
@@ -21,13 +22,13 @@ function getDataFromLink($target) {
         }
     }
     
-    if($authors == null) {
+    if ($authors == null) {
         $authors = "";
     }
     
     // tittel
     $headline = $html->find('.headline', 0);
-    if($headline != null) {
+    if ($headline != null) {
         $headline = $headline->plaintext;
     } else {
         $headline = "";
@@ -50,7 +51,7 @@ function getDataFromLink($target) {
 
     // publiserings dato
     $date = $html->find('.published time', 0);
-    if($date != null) {
+    if ($date != null) {
         $date = $date->datetime;
     } else {
         $date = "";
@@ -60,19 +61,26 @@ function getDataFromLink($target) {
     $html->clear();
     unset($html);
     
-    return ["tittel"=>$headline, "toppbilde"=>$topImage, "forfatter"=>trim($authors), "url"=>$target, "dato"=>$date];
+    return [
+        "tittel"=>$headline, 
+        "toppbilde"=>$topImage, 
+        "forfatter"=>trim($authors), 
+        "url"=>$target, 
+        "dato"=>$date
+    ];
 }
 
 
-function scrape($query) {
+function scrape($query) 
+{
     $next = true;
     $data = [];
     $url = 'https://www.tu.no/artikler';
     $link = 'https://www.tu.no/artikler?q=' . $query;
     
-    while ($next){
-        $html = HtmlDomParser::file_get_html($link, false, null, 0 );
-        foreach($html->find('tbody tr') as $link) {
+    while ($next) {
+        $html = HtmlDomParser::file_get_html($link, false, null, 0);
+        foreach ($html->find('tbody tr') as $link) {
             $time =  $link->find('time', 0);
             if ($time != null) {
                 $year = substr($time->innertext, -4);
@@ -94,40 +102,59 @@ function scrape($query) {
 }
 
 
-// for sortering av multiarray
-function arrayMultisortByValue($arrayToSort, $nameOfValue) {
-    $ValueContainer = [];
+/**
+ * For sortering av multiarray
+ */
+function arrayMultisortByValue($arrayToSort, $nameOfValue) 
+{
+    $valueContainer = [];
     foreach ($arrayToSort as $arrayEntry) {
         $ValueContainer[] = $arrayEntry[$nameOfValue];
     }
-    array_multisort($ValueContainer, $arrayToSort);
+    array_multisort($valueContainer, $arrayToSort);
     return $arrayToSort;
 }
 
-// pretty print_r, for finere formatering i html
-function pprint_r($data) {
+/** 
+ * For finere formatering i html 
+ */
+function prettyPrint($data) 
+{
     echo '<pre>';
     print_r($data);
     echo  '</pre>';
 }
 
-// returnerer array som er gruppert på forfatter
-function groupByAuthor($data) {
+/**
+ * Returnerer array som er gruppert på forfatter
+ */
+function groupByAuthor($data) 
+{
     $arr = [];
-    foreach($data as $sd) {
-        $arr[$sd['forfatter']][] = ['tittel'=>$sd['tittel'], 'toppbilde'=>$sd['toppbilde'], 'forfatter'=>$sd['forfatter'], 'url'=>$sd['url'], 'dato'=>$sd['dato']];
+    foreach ($data as $sd) {
+        $arr[$sd['forfatter']][] = [
+            'tittel'=>$sd['tittel'], 
+            'toppbilde'=>$sd['toppbilde'], 
+            'forfatter'=>$sd['forfatter'], 
+            'url'=>$sd['url'], 
+            'dato'=>$sd['dato'
+            ]
+        ];
     }
     return $arr;
 }
+
 $startTime = microtime(true);
 
 $data = scrape('asfalt');
+
+echo "scrape: ". (microtime(true) - $startTime) ."s"; 
 
 $sorted = arrayMultisortByValue($data, 'dato'); // sorter først på dato
 
 $grouped = groupByAuthor($sorted); // så grupperer på forfatter
 
-// pprint_r($grouped);
+// prettyPrint($grouped);
 
 $json = json_encode($grouped, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT);
 
